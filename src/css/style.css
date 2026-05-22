@@ -122,6 +122,14 @@ body.loading-active {
   overflow: hidden;
 }
 
+body.loading-active nav,
+body.loading-active header,
+body.loading-active section,
+body.loading-active footer,
+body.loading-active .page-header {
+  display: none !important;
+}
+
 #page-loader {
   position: fixed;
   top: 0;

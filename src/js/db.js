@@ -256,6 +256,7 @@ export async function getPortfolioData() {
       if (migrated) {
         await savePortfolioData(migratedData);
       }
+      localStorage.setItem('portfolio_data_is_live', 'true');
       return migratedData;
     } else {
       // First run: data doesn't exist in Supabase yet.
@@ -302,6 +303,7 @@ export async function savePortfolioData(data) {
       console.error("Failed to save to Supabase:", error.message);
       return false;
     }
+    localStorage.setItem('portfolio_data_is_live', 'true');
     return true;
   } catch (err) {
     console.error("Error saving to Supabase:", err);

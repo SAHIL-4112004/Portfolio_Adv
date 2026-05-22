@@ -6,6 +6,29 @@ let lastRenderedHash = '';
 
 function renderPortfolio(data) {
   if (!data) return;
+  
+  // Redirect if visiting a subpage of a hidden section
+  if (data.sections) {
+    const pathname = window.location.pathname;
+    const subpageSectionMap = {
+      'projects.html': 'projects',
+      'certificate.html': 'certificates',
+      'badges.html': 'badges',
+      'extracurricular.html': 'extracurricular'
+    };
+
+    for (const [page, sectionId] of Object.entries(subpageSectionMap)) {
+      if (pathname.includes(page)) {
+        const sec = data.sections.find(s => s.id === sectionId);
+        if (sec && sec.visible === false) {
+          console.warn(`Section ${sectionId} is hidden. Redirecting to home...`);
+          window.location.href = 'index.html';
+          return;
+        }
+      }
+    }
+  }
+
   const currentHash = JSON.stringify(data);
   if (currentHash === lastRenderedHash) {
     return;
@@ -437,13 +460,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     yearEl.textContent = new Date().getFullYear();
   }
 
-  // 1. Render immediately from synchronous cached data
-  const hasCache = localStorage.getItem('portfolio_data') !== null;
-  const cachedData = getLocalPortfolioDataSync();
-  if (cachedData) {
-    renderPortfolio(cachedData);
-    if (hasCache) {
-      hideLoader();
+  // 1. Render immediately from synchronous cached data (keeps layout ready behind the loader)
+  const hasCache = localStorage.getItem('portfolio_data_is_live') === 'true';
+  if (hasCache) {
+    const cachedData = getLocalPortfolioDataSync();
+    if (cachedData) {
+      renderPortfolio(cachedData);
     }
   }
 
