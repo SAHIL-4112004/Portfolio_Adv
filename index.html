@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark">
+  <script>
+    (function () {
+      try {
+        let dbTheme = 'dark';
+        let dbAccent = '#8750f7';
+        try {
+          const cached = localStorage.getItem('portfolio_data');
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (parsed.defaultTheme) dbTheme = parsed.defaultTheme;
+            if (parsed.defaultHighlightColor) dbAccent = parsed.defaultHighlightColor;
+          }
+        } catch (e) { }
+
+        const userTheme = localStorage.getItem('portfolio_user_theme');
+        const theme = userTheme !== null ? userTheme : dbTheme;
+        const accent = localStorage.getItem('portfolio_user_accent') || dbAccent;
+
+        function hexToRgb(hex) {
+          const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+          const fullHex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+          const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(fullHex);
+          return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+          } : null;
+        }
+
+        function rgbToHsl(r, g, b) {
+          r /= 255; g /= 255; b /= 255;
+          const max = Math.max(r, g, b), min = Math.min(r, g, b);
+          let h = 0, s = 0, l = (max + min) / 2;
+          if (max !== min) {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+              case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+              case g: h = (b - r) / d + 2; break;
+              case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+          }
+          return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function hslToHex(h, s, l) {
+          l /= 100;
+          const a = s * Math.min(l, 1 - l) / 100;
+          const f = n => {
+            const k = (n + h / 30) % 12;
+            const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+            return Math.round(255 * color).toString(16).padStart(2, '0');
+          };
+          return `#${f(0)}${f(8)}${f(4)}`;
+        }
+
+        function getDarkerHex(hex, targetLightness = 15) {
+          const rgb = hexToRgb(hex);
+          if (!rgb) return '#140c1c';
+          const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+          return hslToHex(hsl.h, hsl.s, targetLightness);
+        }
+
+        if (theme === 'system') {
+          document.documentElement.removeAttribute('data-theme');
+        } else {
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        if (accent) {
+          document.documentElement.style.setProperty('--accent-primary', accent);
+          const rgb = hexToRgb(accent);
+          if (rgb) {
+            document.documentElement.style.setProperty('--accent-primary-rgb', rgb.r + ', ' + rgb.g + ', ' + rgb.b);
+            const secondaryHex = getDarkerHex(accent, 15);
+            document.documentElement.style.setProperty('--accent-secondary', secondaryHex);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  </script>
+  <title>Sahil Khan | Portfolio</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="./src/css/style.css">
+</head>
+
+<body class="loading-active">
+  <!-- Page Loader Overlay -->
+  <div id="page-loader">
+    <div class="loader-spinner"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <div class="logo-icon">SK</div>
+        Md Sahil Khan
+      </a>
+      <div class="nav-links">
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#skills">Skills</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <a href="#contact" class="btn-primary btn-hire">Hire me!</a>
+      <a href="/admin.html" class="btn-outline admin-link" target="_blank" title="Admin Panel"><i
+          class="fa-solid fa-lock"></i></a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero" id="home">
+    <div class="hero-content">
+      <p class="greeting" id="hero-greeting">Hi, I'm MD Sahil Khan</p>
+      <h1 class="name" id="hero-name">Computer Science &<br>Engineering Student</h1>
+      <p class="bio" id="hero-bio">
+        Hello! I'm MD Sahil Khan, a dedicated Computer Science & Engineering student passionate about coding, problem
+        solving, and building innovative software solutions. I transform ideas into functional applications that impact
+        users positively.
+      </p>
+      <div class="hero-actions">
+        <a href="https://drive.google.com/drive/folders/1zZK5nKXhSSaYwZX2ELFWuimHo0HtAEzG?usp=drive_link"
+          class="btn-outline" id="hero-cv-link">Download CV <i class="fa-solid fa-download"></i></a>
+        <div class="social-links">
+          <!-- <a href="#"><i class="fa-brands fa-twitter"></i></a> -->
+          <a href="https://codolio.com/profile/SAHIL_4112004" id="hero-codolio-link"><i
+              class="fa-brands fa-dribbble"></i></a>
+          <a href="https://www.linkedin.com/in/md-sahil-khan-15b719299/" id="hero-linkedin-link"><i
+              class="fa-brands fa-linkedin-in"></i></a>
+          <a href="https://github.com/SAHIL-4112004" id="hero-github-link"><i class="fa-brands fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="image-wrapper">
+        <img src="imgs/PP-1.jpeg" alt="Sahil Khan" class="profile-img" id="hero-profile-img">
+      </div>
+    </div>
+  </header>
+
+  <!-- Stats Section -->
+  <section class="stats-section" id="stats-container">
+    <div class="stat-item">
+      <div class="stat-number">3+</div>
+      <div class="stat-text">Projects<br>Completed</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">5+</div>
+      <div class="stat-text">Technical<br>Certificates</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">2+</div>
+      <div class="stat-text">Hackathons<br>Attended</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">1</div>
+      <div class="stat-text">Job<br>Simulator</div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about-section" id="about">
+    <div class="about-container">
+      <div class="about-image">
+        <img src="https://images.unsplash.com/photo-1549692520-acc6669e2f0c?auto=format&fit=crop&w=600&q=80"
+          alt="About Me" id="about-img">
+      </div>
+      <div class="about-content">
+        <h2 class="section-title" id="about-title">About Me</h2>
+        <h3 class="about-subtitle" id="about-subtitle">I'm a Passionate Web Developer who loves crafting beautiful
+          digital experiences.</h3>
+        <p class="about-text" id="about-par1">
+          I have always been fascinated by how technology shapes our world. My journey into programming started with a
+          simple curiosity and quickly evolved into a passion. I specialize in building robust web applications that not
+          only solve real-world problems but also provide an intuitive and engaging user experience.
+        </p>
+        <p class="about-text" id="about-par2">
+          When I'm not coding, you can find me exploring new technologies, contributing to open-source projects, or
+          learning about software architecture. I'm always looking for opportunities to grow and collaborate with
+          like-minded individuals.
+        </p>
+        <div class="about-info">
+          <div class="info-box">
+            <span class="info-label">Name</span>
+            <span class="info-value" id="about-name">MD Sahil Khan</span>
+          </div>
+          <div class="info-box">
+            <span class="info-label">Email</span>
+            <span class="info-value" id="about-email">sahil4112004khan@mail.com</span>
+          </div>
+          <div class="info-box">
+            <span class="info-label">Location</span>
+            <span class="info-value" id="about-location">Vadodara, Gujarat</span>
+          </div>
+          <div class="info-box">
+            <span class="info-label">Availability</span>
+            <span class="info-value" id="about-availability" style="color: var(--accent-primary);">Open for work</span>
+          </div>
+        </div>
+        <a href="#contact" class="btn-primary">Let's Talk</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Education Section -->
+  <section class="education-section" id="education">
+    <div class="section-header">
+      <h2 class="section-title">My Education</h2>
+      <p class="section-subtitle">My academic background.</p>
+    </div>
+    <div class="timeline" id="education-timeline" style="max-width: 800px; margin: 0 auto;">
+      <div class="timeline-item">
+        <div class="timeline-date">Present</div>
+        <h3 class="timeline-title">B.Tech Computer Science & Engineering</h3>
+        <p class="timeline-subtitle">Parul University, Vadodara, Gujarat</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Past</div>
+        <h3 class="timeline-title">Higher Secondary Education</h3>
+        <p class="timeline-subtitle">Kendriya Vidyalaya SPM, Narmadapuram, Madhya Pradesh</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills Section -->
+  <section class="skills-section" id="skills">
+    <div class="section-header">
+      <h2 class="section-title">My Skills</h2>
+      <p class="section-subtitle">Technologies and tools I work with.</p>
+    </div>
+    <div class="skills-grid" id="skills-grid">
+      <div class="skill-item">
+        <div class="skill-icon"><i class="fa-brands fa-html5"></i></div>
+        <div class="skill-percentage">HTML & CSS</div>
+        <!-- <div class="skill-name">HTML & CSS</div> -->
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon"><i class="fa-brands fa-js"></i></div>
+        <div class="skill-percentage">JavaScript</div>
+        <!-- <div class="skill-name">JavaScript</div> -->
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon"><i class="fa-brands fa-java"></i></div>
+        <div class="skill-percentage">Java</div>
+        <!-- <div class="skill-name">Java</div> -->
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon"><i class="fa-solid fa-database"></i></div>
+        <div class="skill-percentage">MySQL</div>
+        <!-- <div class="skill-name">MySQL</div> -->
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon"><i class="fa-solid fa-database"></i></div>
+        <div class="skill-percentage">MongoDB</div>
+        <!-- <div class="skill-name">MongoDB</div> -->
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon"><i class="fa-brands fa-git-alt"></i></div>
+        <div class="skill-percentage">Git & GitHub</div>
+        <!-- <div class="skill-name">Git & GitHub</div> -->
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon"><i class="fa-brands fa-linux"></i></div>
+        <div class="skill-percentage">Linux</div>
+        <!-- <div class="skill-name">Linux</div> -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Section -->
+  <section class="works-section" id="projects">
+    <div class="section-header">
+      <h2 class="section-title">Projects</h2>
+      <!-- <div class="work-filters">
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Web</button>
+        <button class="filter-btn">App</button>
+        <button class="filter-btn">Design</button>
+      </div> -->
+    </div>
+
+    <!-- Dynamic Projects Container -->
+    <div class="works-grid" id="projects-container">
+      <div class="work-card">
+        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80"
+          alt="Project 1">
+        <div class="work-info">
+          <h3>AppDost</h3>
+          <p>React Native, Firebase, Context API</p>
+          <p
+            style="margin-top: 10px; color: var(--text-secondary); font-size: 0.9rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+            React Native mobile assignment showcasing Firebase integration and state management.</p>
+          <div class="project-actions">
+            <a href="https://github.com/SAHIL-4112004/AppDost-Assignment" target="_blank" class="project-btn repo-btn">
+              <i class="fa-brands fa-github"></i> Repository
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="work-card">
+        <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80"
+          alt="Project 2">
+        <div class="work-info">
+          <h3>Student Placement Management System</h3>
+          <p>Java, Spring Boot, MySQL</p>
+          <p
+            style="margin-top: 10px; color: var(--text-secondary); font-size: 0.9rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+            A comprehensive backend system for placement tracking built with Java Spring Boot.</p>
+          <div class="project-actions">
+            <a href="https://github.com/SAHIL-4112004/Student-Placement-Management-System" target="_blank"
+              class="project-btn repo-btn">
+              <i class="fa-brands fa-github"></i> Repository
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 50px;">
+      <a href="projects.html" class="btn-primary">See More <i class="fa-solid fa-arrow-right"
+          style="margin-left: 8px;"></i></a>
+    </div>
+  </section>
+
+  <!-- Experience Section -->
+  <section class="experience-section" id="experience">
+    <div class="section-header">
+      <h2 class="section-title">My Experience</h2>
+      <p class="section-subtitle">Professional work and internships.</p>
+    </div>
+    <div class="timeline" id="experience-timeline" style="max-width: 800px; margin: 0 auto;">
+      <!-- Experience items injected dynamically -->
+    </div>
+  </section>
+
+  <!-- Certificates Section -->
+  <section class="certificates-section" id="certificates">
+    <div class="section-header">
+      <h2 class="section-title">My Certificates</h2>
+      <p class="section-subtitle">A showcase of my continuous learning and achievements.</p>
+    </div>
+
+    <div class="certificates-grid" id="certificates-grid">
+      <div class="work-card">
+        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80"
+          alt="Certificate 1">
+        <div class="work-info">
+          <h3>Computer Network & Internet Protocol</h3>
+          <p>Issued by NPTEL</p>
+        </div>
+      </div>
+      <div class="work-card">
+        <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80"
+          alt="Certificate 2">
+        <div class="work-info">
+          <h3>Job Simulator</h3>
+          <p>Issued by Deloitte</p>
+        </div>
+      </div>
+      <div class="work-card">
+        <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=600&q=80"
+          alt="Certificate 3">
+        <div class="work-info">
+          <h3>Vadodara Hackathon 6.0</h3>
+          <p>Issued by PIERC</p>
+        </div>
+      </div>
+      <div class="work-card">
+        <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80"
+          alt="Certificate 4">
+        <div class="work-info">
+          <h3>DSA with Java</h3>
+          <p>Issued by Apna College</p>
+        </div>
+      </div>
+      <div class="work-card">
+        <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80"
+          alt="Certificate 5">
+        <div class="work-info">
+          <h3>Frontend Web Development</h3>
+          <p>Issued by FreeCodeCamp</p>
+        </div>
+      </div>
+      <div class="work-card">
+        <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&w=600&q=80"
+          alt="Certificate 6">
+        <div class="work-info">
+          <h3>Introduction to Cybersecurity</h3>
+          <p>Issued by Cisco</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px;">
+      <a href="certificate.html" class="btn-primary">See More <i class="fa-solid fa-arrow-right"
+          style="margin-left: 8px;"></i></a>
+    </div>
+  </section>
+
+  <!-- Badges Section -->
+  <section class="badges-section" id="badges">
+    <div class="section-header">
+      <h2 class="section-title">My Badges</h2>
+      <p class="section-subtitle">Recognitions and achievements.</p>
+    </div>
+    <div class="badges-grid" id="badges-grid">
+      <div class="badge-item">
+        <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=150&q=80"
+          alt="Badge 1">
+        <p>Top Performer</p>
+      </div>
+      <div class="badge-item">
+        <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=150&q=80"
+          alt="Badge 2">
+        <p>Problem Solver</p>
+      </div>
+      <div class="badge-item">
+        <img src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=150&q=80"
+          alt="Badge 3">
+        <p>Innovator</p>
+      </div>
+      <div class="badge-item">
+        <img src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=150&q=80"
+          alt="Badge 4">
+        <p>Innovator</p>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px;">
+      <a href="badges.html" class="btn-primary">See More <i class="fa-solid fa-arrow-right"
+          style="margin-left: 8px;"></i></a>
+    </div>
+  </section>
+
+  <!-- Extracurricular Activities Section -->
+  <section class="extracurricular-section" id="extracurricular">
+    <div class="section-header">
+      <h2 class="section-title">Extracurricular Activities</h2>
+      <p class="section-subtitle">What I do outside of academics and work.</p>
+    </div>
+    <div class="works-grid" id="extracurricular-grid">
+      <div class="timeline-item">
+        <div class="timeline-date">2024 - Present</div>
+        <h3 class="timeline-title">Tech Club Core Member</h3>
+        <p class="timeline-subtitle">Organizing hackathons and coding workshops for university students.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2023 - 2024</div>
+        <h3 class="timeline-title">Volunteer at Local NGO</h3>
+        <p class="timeline-subtitle">Teaching basic computer skills to underprivileged children.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2022 - 2023</div>
+        <h3 class="timeline-title">Google Developer Student Club</h3>
+        <p class="timeline-subtitle">Active participant in study jams and peer learning sessions.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2021 - 2022</div>
+        <h3 class="timeline-title">Debate Society</h3>
+        <p class="timeline-subtitle">Participated in national level inter-university debate competitions.</p>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px;">
+      <a href="extracurricular.html" class="btn-primary">See More <i class="fa-solid fa-arrow-right"
+          style="margin-left: 8px;"></i></a>
+    </div>
+  </section>
+
+
+  <!-- Contact & Footer Section -->
+  <section class="contact-section" id="contact">
+    <div class="contact-container">
+      <div class="contact-form-container">
+        <h2 class="section-title"
+          style="-webkit-text-fill-color: var(--accent-primary); background: none; color: var(--accent-primary);">Let's
+          work together!</h2>
+        <p class="section-subtitle" style="margin-left: 0;">I design and code beautifully simple things and i love what
+          i do. Just simple like that!</p>
+        <form class="contact-form" id="contact-form">
+          <div class="form-row">
+            <input type="text" id="contact-first-name" name="firstName" placeholder="First name" required>
+            <input type="text" id="contact-last-name" name="lastName" placeholder="Last name" required>
+          </div>
+          <div class="form-row">
+            <input type="email" id="contact-email-input" name="email" placeholder="Email address" required>
+            <input type="tel" id="contact-phone-input" name="phone" placeholder="Phone number" required>
+          </div>
+          <select id="contact-service" name="service" required>
+            <option value="" disabled selected>— Please choose an option —</option>
+            <option value="web">Web Design</option>
+            <option value="app">App Design</option>
+            <option value="branding">Branding</option>
+          </select>
+          <textarea id="contact-message-input" name="message" placeholder="Message" rows="5" required></textarea>
+          <button type="submit" class="btn-primary" style="align-self: flex-start;">Send Message</button>
+        </form>
+      </div>
+      <div class="contact-info">
+        <div class="info-item">
+          <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
+          <div class="info-details">
+            <span>Phone</span>
+            <p id="contact-phone">+01 123 654 8096</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon"><i class="fa-solid fa-envelope"></i></div>
+          <div class="info-details">
+            <span>Email</span>
+            <p id="contact-email">sahil@mail.com</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
+          <div class="info-details">
+            <span>Address</span>
+            <p id="contact-address">Warne Park Street Pine,<br>FL 33157, New York</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-logo">
+      <div class="logo-icon">S</div>
+    </div>
+    <!-- <div class="footer-links">
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </div> -->
+    <p class="copyright">© 2026 MD Sahil Khan. All rights reserved.</p>
+  </footer>
+
+  <script type="module" src="/src/js/app.js"></script>
+</body>
+
+</html>

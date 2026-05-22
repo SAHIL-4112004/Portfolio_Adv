@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark">
+    <script>
+      (function() {
+        try {
+          let dbTheme = 'dark';
+          let dbAccent = '#8750f7';
+          try {
+            const cached = localStorage.getItem('portfolio_data');
+            if (cached) {
+              const parsed = JSON.parse(cached);
+              if (parsed.defaultTheme) dbTheme = parsed.defaultTheme;
+              if (parsed.defaultHighlightColor) dbAccent = parsed.defaultHighlightColor;
+            }
+          } catch (e) {}
+
+          const userTheme = localStorage.getItem('portfolio_user_theme');
+          const theme = userTheme !== null ? userTheme : dbTheme;
+          const accent = localStorage.getItem('portfolio_user_accent') || dbAccent;
+          
+          function hexToRgb(hex) {
+            const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+            const fullHex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(fullHex);
+            return result ? {
+              r: parseInt(result[1], 16),
+              g: parseInt(result[2], 16),
+              b: parseInt(result[3], 16)
+            } : null;
+          }
+
+          function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h = 0, s = 0, l = (max + min) / 2;
+            if (max !== min) {
+              const d = max - min;
+              s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+              switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+              }
+              h /= 6;
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+          }
+
+          function hslToHex(h, s, l) {
+            l /= 100;
+            const a = s * Math.min(l, 1 - l) / 100;
+            const f = n => {
+              const k = (n + h / 30) % 12;
+              const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+              return Math.round(255 * color).toString(16).padStart(2, '0');
+            };
+            return `#${f(0)}${f(8)}${f(4)}`;
+          }
+
+          function getDarkerHex(hex, targetLightness = 15) {
+            const rgb = hexToRgb(hex);
+            if (!rgb) return '#140c1c';
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            return hslToHex(hsl.h, hsl.s, targetLightness);
+          }
+
+          if (theme === 'system') {
+            document.documentElement.removeAttribute('data-theme');
+          } else {
+            document.documentElement.setAttribute('data-theme', theme);
+          }
+
+          if (accent) {
+            document.documentElement.style.setProperty('--accent-primary', accent);
+            const rgb = hexToRgb(accent);
+            if (rgb) {
+              document.documentElement.style.setProperty('--accent-primary-rgb', rgb.r + ', ' + rgb.g + ', ' + rgb.b);
+              const secondaryHex = getDarkerHex(accent, 15);
+              document.documentElement.style.setProperty('--accent-secondary', secondaryHex);
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      })();
+    </script>
+    <title>Admin Dashboard | Portfolio</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./src/css/style.css">
+    <link rel="stylesheet" href="./src/css/admin.css">
+  </head>
+  <body>
+    <!-- Protocol Warning Banner -->
+    <div id="protocol-warning" class="hidden" style="background: #ef4444; color: #fff; padding: 14px 20px; text-align: center; font-weight: bold; font-family: 'Sora', sans-serif; font-size: 0.95rem; z-index: 10000; position: relative; border-bottom: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+      ⚠️ Warning: You have opened this page directly via the file:// protocol. Local ES modules will fail to resolve. Please run "npm run dev" and open <a href="http://localhost:5173/admin.html" style="color: #fff; text-decoration: underline; font-weight: 800;">http://localhost:5173/admin.html</a> in your browser.
+    </div>
+    <script>
+      if (window.location.protocol === 'file:') {
+        document.getElementById('protocol-warning').classList.remove('hidden');
+      }
+    </script>
+
+    <!-- Background Blobs -->
+    <div class="blob blob-1" style="background: radial-gradient(circle, rgba(135,80,247,0.15) 0%, rgba(15,7,21,0) 70%);"></div>
+    <div class="blob blob-2" style="background: radial-gradient(circle, rgba(42,20,84,0.2) 0%, rgba(15,7,21,0) 70%);"></div>
+
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="/" class="logo">
+          <div class="logo-icon">SK</div>
+          Admin Panel
+        </a>
+        <div class="nav-links">
+          <a href="/" class="btn-outline"><i class="fa-solid fa-arrow-left"></i> Back to Site</a>
+          <button id="logout-btn" class="btn-outline hidden"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="admin-main">
+      <!-- Login Section -->
+      <section id="login-section" class="admin-section fade-in">
+        <div class="glass-card login-card">
+          <h2 class="section-title" style="font-size: 2rem; margin-bottom: 0.5rem;">Secure <span class="gradient-text">Login</span></h2>
+          <p class="section-subtitle" style="margin-bottom: 2rem;">Please authenticate to access the dashboard.</p>
+          
+          <form id="login-form">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" required placeholder="sahil4112004khan@gmail.com">
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+              Login <i class="fa-solid fa-lock" style="margin-left: 8px;"></i>
+            </button>
+            <p id="login-error" class="error-msg hidden">Invalid credentials. Please try again.</p>
+          </form>
+        </div>
+      </section>
+
+      <!-- Dashboard Section (Hidden by default) -->
+      <section id="dashboard-section" class="admin-section hidden">
+        <!-- Welcome Message Header -->
+        <header class="dashboard-header">
+          <div>
+            <h1 class="welcome-title">Welcome Back, <span class="gradient-text">Admin</span>!</h1>
+            <p class="section-subtitle" style="margin-left: 0;">Configure and manage your portfolio sections dynamically.</p>
+          </div>
+        </header>
+
+        <!-- Admin Workspace Layout -->
+        <div class="admin-workspace">
+          <!-- Sidebar Navigation Tabs -->
+          <aside class="admin-sidebar glass-card">
+            <ul class="admin-tabs">
+              <li class="tab-item active" data-tab="sections"><i class="fa-solid fa-layer-group"></i> Manage Sections</li>
+              <li class="tab-item" data-tab="hero"><i class="fa-solid fa-user"></i> Hero Section</li>
+              <li class="tab-item" data-tab="stats"><i class="fa-solid fa-chart-simple"></i> Stats Counter</li>
+              <li class="tab-item" data-tab="about"><i class="fa-solid fa-circle-info"></i> About Me</li>
+              <li class="tab-item" data-tab="education"><i class="fa-solid fa-graduation-cap"></i> Education</li>
+              <li class="tab-item" data-tab="skills"><i class="fa-solid fa-bolt"></i> Skills</li>
+              <li class="tab-item" data-tab="projects"><i class="fa-solid fa-briefcase"></i> Projects</li>
+              <li class="tab-item" data-tab="experience"><i class="fa-solid fa-laptop-code"></i> Experience</li>
+              <li class="tab-item" data-tab="certificates"><i class="fa-solid fa-award"></i> Certificates</li>
+              <li class="tab-item" data-tab="badges"><i class="fa-solid fa-id-badge"></i> Badges</li>
+              <li class="tab-item" data-tab="extracurricular"><i class="fa-solid fa-icons"></i> Extracurricular</li>
+              <li class="tab-item" data-tab="contact"><i class="fa-solid fa-address-book"></i> Contact Info</li>
+              <li class="tab-item" data-tab="settings"><i class="fa-solid fa-gear"></i> General Settings</li>
+              <li class="tab-item" data-tab="messages" id="messages-tab-btn"><i class="fa-solid fa-envelope"></i> Inbox <span class="messages-badge hidden" id="messages-unread-badge">0</span></li>
+            </ul>
+          </aside>
+
+          <!-- Tab Content Area -->
+          <div class="admin-content glass-card">
+            <div id="tab-content-loader" class="loader-container hidden">
+              <div class="spinner"></div>
+            </div>
+            <div id="tab-content-body"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/js/admin.js"></script>
+  </body>
+</html>

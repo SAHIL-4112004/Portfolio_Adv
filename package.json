@@ -1,0 +1,21 @@
+{
+  "name": "portfolio_antigravity",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "db:migrate": "node scripts/migrate-to-supabase.js"
+  },
+  "devDependencies": {
+    "vite": "^8.0.13"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.106.1",
+    "dotenv": "^17.4.2",
+    "firebase": "^12.13.0"
+  }
+}
