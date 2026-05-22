@@ -594,13 +594,13 @@ document.addEventListener('DOMContentLoaded', () => {
       [
         { name: 'title', label: 'Project Name', type: 'text', required: true, placeholder: 'e.g. AppDost' },
         { name: 'technologies', label: 'Technologies Used (Comma separated)', type: 'text', required: true, placeholder: 'React, Spring Boot, MySQL' },
-        { name: 'imageUrl', label: 'Cover Image', type: 'image', required: false, placeholder: 'https://images.unsplash.com/...' },
+        { name: 'imageUrl', label: 'Cover Image', type: 'image', required: false, placeholder: 'Image URL or Upload a file...' },
         { name: 'link', label: 'Repository URL (e.g. GitHub)', type: 'text', required: false, placeholder: 'https://github.com/...' },
         { name: 'liveLink', label: 'Live Project URL (Demo / Website)', type: 'text', required: false, placeholder: 'https://...' },
         { name: 'description', label: 'Detailed Description', type: 'textarea', required: true, placeholder: 'Describe the project details...' }
       ],
       (item) => {
-        const defaultImg = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400';
+        const defaultImg = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
         return `
           <img src="${escapeHtml(item.imageUrl || defaultImg)}" class="item-img" alt="${escapeHtml(item.title)}" onerror="this.src='${defaultImg}'">
           <div class="item-details">
@@ -649,7 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
       [
         { name: 'title', label: 'Certificate Name', type: 'text', required: true, placeholder: 'e.g. Computer Network & Internet Protocol' },
         { name: 'issuer', label: 'Issuing Body', type: 'text', required: true, placeholder: 'e.g. Issued by NPTEL' },
-        { name: 'imageUrl', label: 'Certificate Image', type: 'image', required: true, placeholder: 'https://images.unsplash.com/...' },
+        { name: 'imageUrl', label: 'Certificate Image', type: 'image', required: true, placeholder: 'Image URL or Upload a file...' },
         { name: 'link', label: 'Verification Link URL', type: 'text', required: false, placeholder: 'https://verify.nptel.ac.in/...' }
       ],
       (item) => `
@@ -670,7 +670,7 @@ document.addEventListener('DOMContentLoaded', () => {
       data,
       [
         { name: 'title', label: 'Badge Title', type: 'text', required: true, placeholder: 'e.g. Top Performer' },
-        { name: 'imageUrl', label: 'Badge Image', type: 'image', required: true, placeholder: 'https://images.unsplash.com/...' },
+        { name: 'imageUrl', label: 'Badge Image', type: 'image', required: true, placeholder: 'Image URL or Upload a file...' },
         { name: 'link', label: 'Badge Verification / Info URL', type: 'text', required: false, placeholder: 'https://credly.com/...' }
       ],
       (item) => `

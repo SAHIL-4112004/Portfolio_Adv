@@ -213,7 +213,7 @@ function renderPortfolio(data) {
         const card = document.createElement('div');
         card.className = 'work-card';
         
-        const defaultImg = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800';
+        const defaultImg = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
         const imgSrc = project.imageUrl || defaultImg;
         const isLinked = project.link && project.link.trim() !== '';
         const isLiveLinked = project.liveLink && project.liveLink.trim() !== '';
